@@ -4,6 +4,10 @@
 
 Inspired by [great research](https://nicegear.nz/blog/hacking-a-mitsubishi-heat-pump-air-conditioner/) made by [Hadley Rich](https://github.com/hadleyrich) from New Zealand and [SwiCago](https://github.com/SwiCago), who sorted all out and made an [Arduino implementation](https://github.com/SwiCago/HeatPump) and tutorial
 
+The protocol was borrow from original `Mitsubishi MAC-567IF-E` controller:
+
+<img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/MAC-567IF-E.png"/>
+
 ## Hardware
 
 Mitsubishi indoor unit's control board has ***CN105*** (red) connector for communication purposes.
@@ -15,7 +19,10 @@ It's currently tested on `ESP8266` platform
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-nodem.png"/>
 
+Case 3D design:
+
 ![](https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/wifi-nodem-case.gif)
+
 ### ESP-01 + 5V adapter
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-esp-01.png"/>
