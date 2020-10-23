@@ -15,6 +15,7 @@ It's currently tested on `ESP8266` platform
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-nodem.png"/>
 
+![](https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/wifi-nodem-case.gif)
 ### ESP-01 + 5V adapter
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-esp-01.png"/>
