@@ -1,0 +1,21 @@
+author: d4rkmen <darkmen@i.ua>
+description: Library that implements Mitsubishi Electric AirCo and HeatPump communication by UART
+type: lib
+version: 1.0
+
+tags:
+  - c
+  - hw
+
+sources:
+  - src
+
+includes:
+  - include
+
+config_schema:
+
+libs:
+
+# Used by the mos tool to catch mos binaries incompatible with this file format
+manifest_version: 2020-08-02
