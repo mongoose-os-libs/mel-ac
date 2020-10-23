@@ -13,11 +13,11 @@ It's currently tested on `ESP8266` platform
 
 ### RobotDyn WiFi-NodeM
 
-<img src="https://github.com/mongoose-os-libs/mel-ac/blob/main/docs/mel-ac-nodem.png"/>
+<img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-esp-01.png"/>
 
 ### ESP-01 + 5V adapter
 
-<img src="https://github.com/mongoose-os-libs/mel-ac/blob/main/docs/mel-ac-esp-01.png"/>
+<img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-esp-01.png"/>
 
 ## Software
 
