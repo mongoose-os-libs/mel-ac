@@ -295,7 +295,7 @@ void mgos_mel_ac_packet_read(struct mgos_mel_ac *mel) {
     rx_count--;
   }
 }
-
+#if 0
 // blocking packet read
 int mgos_mel_ac_packet_wait(struct mgos_mel_ac *mel) {
   uint8_t want_bytes = 1;  // packet start
@@ -315,7 +315,6 @@ int mgos_mel_ac_packet_wait(struct mgos_mel_ac *mel) {
     now = mgos_uptime_micros();
     n = mgos_uart_read(mel->uart_no, ((uint8_t *) &mel->packet) + have_bytes,
                        want_bytes - have_bytes);
-    if (n < 0) return MGOS_MEL_AC_PACKETRECIEVEERR;
     if (n == 0) continue;
     if (start_found) {
       have_bytes += n;
@@ -338,6 +337,7 @@ int mgos_mel_ac_packet_wait(struct mgos_mel_ac *mel) {
   }
   return MGOS_MEL_AC_TIMEOUT;
 }
+#endif
 
 void mgos_mel_ac_connect(struct mgos_mel_ac *mel) {
   mel->connected = false;
