@@ -578,99 +578,100 @@ bool mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
     default:
       return false;
   }
+}
 
-  void mgos_mel_ac_set_params(struct mgos_mel_ac * mel,
-                              struct mgos_mel_ac_params * params) {
-    if (!mel) return;
-    mel->new_params = *params;
-    mel->set_params = true;
-  }
+void mgos_mel_ac_set_params(struct mgos_mel_ac *mel,
+                            struct mgos_mel_ac_params *params) {
+  if (!mel) return;
+  mel->new_params = *params;
+  mel->set_params = true;
+}
 
-  enum mgos_mel_ac_param_power mgos_mel_ac_get_power(struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->params.power;
-    else
-      return MGOS_MEL_AC_PARAM_POWER_OFF;
-  }
+enum mgos_mel_ac_param_power mgos_mel_ac_get_power(struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->params.power;
+  else
+    return MGOS_MEL_AC_PARAM_POWER_OFF;
+}
 
-  enum mgos_mel_ac_param_mode mgos_mel_ac_get_mode(struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->params.mode;
-    else
-      return MGOS_MEL_AC_PARAM_MODE_CURRENT;
-  }
+enum mgos_mel_ac_param_mode mgos_mel_ac_get_mode(struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->params.mode;
+  else
+    return MGOS_MEL_AC_PARAM_MODE_CURRENT;
+}
 
-  float mgos_mel_ac_get_setpoint(struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->params.setpoint;
-    else
-      return 0.0;
-  }
+float mgos_mel_ac_get_setpoint(struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->params.setpoint;
+  else
+    return 0.0;
+}
 
-  enum mgos_mel_ac_param_fan mgos_mel_ac_get_fan(struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->params.fan;
-    else
-      return MGOS_MEL_AC_PARAM_FAN_AUTO;
-  }
+enum mgos_mel_ac_param_fan mgos_mel_ac_get_fan(struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->params.fan;
+  else
+    return MGOS_MEL_AC_PARAM_FAN_AUTO;
+}
 
-  enum mgos_mel_ac_param_vane_vert mgos_mel_ac_get_vane_vert(
-      struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->params.vane_vert;
-    else
-      return MGOS_MEL_AC_PARAM_VANE_VERT_AUTO;
-  }
+enum mgos_mel_ac_param_vane_vert mgos_mel_ac_get_vane_vert(
+    struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->params.vane_vert;
+  else
+    return MGOS_MEL_AC_PARAM_VANE_VERT_AUTO;
+}
 
-  enum mgos_mel_ac_param_vane_horiz mgos_mel_ac_get_vane_horiz(
-      struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->params.vane_horiz;
-    else
-      return MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO;
-  }
+enum mgos_mel_ac_param_vane_horiz mgos_mel_ac_get_vane_horiz(
+    struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->params.vane_horiz;
+  else
+    return MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO;
+}
 
-  bool mgos_mel_ac_param_get_isee(struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->params.isee;
-    else
-      return false;
-  }
+bool mgos_mel_ac_param_get_isee(struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->params.isee;
+  else
+    return false;
+}
 
-  void mgos_mel_ac_get_params(struct mgos_mel_ac * mel,
-                              struct mgos_mel_ac_params * params) {
-    if (!mel || !params) return;
-    *params = mel->params;
-  }
+void mgos_mel_ac_get_params(struct mgos_mel_ac *mel,
+                            struct mgos_mel_ac_params *params) {
+  if (!mel || !params) return;
+  *params = mel->params;
+}
 
-  bool mgos_mel_ac_get_operating(struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->operating;
-    else
-      return false;
-  }
+bool mgos_mel_ac_get_operating(struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->operating;
+  else
+    return false;
+}
 
-  float mgos_mel_ac_get_room_temperature(struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->room_temperature;
-    else
-      return 0.0;
-  }
+float mgos_mel_ac_get_room_temperature(struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->room_temperature;
+  else
+    return 0.0;
+}
 
-  bool mgos_mel_ac_connected(struct mgos_mel_ac * mel) {
-    if (mel)
-      return mel->connected;
-    else
-      return false;
-  }
+bool mgos_mel_ac_connected(struct mgos_mel_ac *mel) {
+  if (mel)
+    return mel->connected;
+  else
+    return false;
+}
 
-  void mgos_mel_ac_destroy(struct mgos_mel_ac * *mel) {
-    LOG(LL_DEBUG, ("Destroing MEL object...."));
-    if (*mel) free((*mel));
-    *mel = NULL;
-    return;
-  }
+void mgos_mel_ac_destroy(struct mgos_mel_ac **mel) {
+  LOG(LL_DEBUG, ("Destroing MEL object...."));
+  if (*mel) free((*mel));
+  *mel = NULL;
+  return;
+}
 
-  bool mgos_mel_ac_init(void) {
-    return true;
-  }
+bool mgos_mel_ac_init(void) {
+  return true;
+}
