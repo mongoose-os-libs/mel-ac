@@ -17,10 +17,6 @@ The communication performed by UART @ 2400 8E1 (5V TTL). The ***CN105*** connect
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-nodem.png"/>
 
-Case 3D design for WiFi-NodeM:
-
-![](https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/wifi-nodem-case.gif)
-
 ### ESP-01 + 5V adapter
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-esp-01.png"/>
@@ -88,3 +84,11 @@ void mgos_mel_ac_set_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *
 It's currently tested on `ESP8266` platform. More is coming
 
 For a complete demonstration of the driver, look at this [Mongoose App](https://github.com/mongoose-os-apps/mel-ac-demo)
+
+## Extra
+
+A sample case 3D design for WiFi-NodeM:
+
+![](https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/wifi-nodem-case.gif)
+
+Ready to print STL images available for [top](https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/nodem-top-case-v24.stl) and [bottom](https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/nodem-bottom-case-v24.stl) part
