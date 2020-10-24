@@ -1,31 +1,43 @@
 # MEL-AC lib for Mongoose OS
 
-***Mitsubishi Electric*** AirCo and HeatPump control by UART using amasing IoT platform - ***Mongoose OS***
+***Mitsubishi Electric*** AC (air condition unit) and ATW (air to water unit) control by UART using amasing IoT platform - ***Mongoose OS***
 
 Inspired by [great research](https://nicegear.nz/blog/hacking-a-mitsubishi-heat-pump-air-conditioner/) made by [Hadley Rich](https://github.com/hadleyrich) from New Zealand and [SwiCago](https://github.com/SwiCago), who sorted all out and made an [Arduino implementation](https://github.com/SwiCago/HeatPump) and tutorial
 
-The protocol was borrow from original `Mitsubishi MAC-567IF-E` controller:
+## Hardware
+
+The protocol was sniffed from original `Mitsubishi MAC-567IF-E` controller:
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/MAC-567IF-E.png"/>
 
-## Hardware
-
-Mitsubishi indoor unit's control board has ***CN105*** (red) connector for communication purposes.
-The communication performed by UART @ 2400 8E1 (5V TTL). The ***CN105*** connector pinouts (1..5) = RX, TX, 5V, GND, 12V
-
-It's currently tested on `ESP8266` platform
+Mitsubishi indoor unit's control board has ***CN105*** (RED) connector for communication purposes.
+The communication performed by UART @ 2400 8E1 (5V TTL)
+The ***CN105*** connector pinouts (1..5) = RX, TX, 5V, GND, 12V
 
 ### RobotDyn WiFi-NodeM
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-nodem.png"/>
 
-Case 3D design:
+Case 3D design for WiFi-NodeM:
 
 ![](https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/wifi-nodem-case.gif)
 
 ### ESP-01 + 5V adapter
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-esp-01.png"/>
+
+
+```IMPORTANT:``` When mounting the ```MEC-AC``` unit inside an indoor unit, refer to the installation manual of the indoor unit. 
+Do not mount the Interface unit inside the indoor unit, if not mentioned
+
+```AC```'s indoor unit mount:
+
+<img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/ac_mount.png"/>
+
+
+```ATW```'s indoor unit mount:
+
+<img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/atw_mount.png"/>
 
 ## Software
 
@@ -66,5 +78,7 @@ void mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
                              enum mgos_mel_ac_param_vane_horiz vane_horiz);
 void mgos_mel_ac_set_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *params);
 ```
+
+It's currently tested on `ESP8266` platform. More is coming
 
 For a complete demonstration of the driver, look at this [Mongoose App](https://github.com/mongoose-os-apps/mel-ac-demo)
