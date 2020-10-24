@@ -50,7 +50,7 @@ static uint8_t mgos_mel_ac_packet_crc(uint8_t *data, uint8_t size) {
 }
 
 void mgos_mel_ac_packet_send(struct mgos_mel_ac *mel, uint8_t flags,
-                          enum mgos_mel_ac_packet_type type, uint8_t size) {
+                             enum mgos_mel_ac_packet_type type, uint8_t size) {
   mel->packet.header.magic = MGOS_MEL_AC_PACKET_MAGIC;
   mel->packet.header.flags = MGOS_MEL_AC_PACKET_FLAGS_OUT | flags;
   mel->packet.header.ver_maj = MGOS_MEL_AC_PACKET_VER_MAJ;
@@ -65,22 +65,22 @@ void mgos_mel_ac_packet_send(struct mgos_mel_ac *mel, uint8_t flags,
   char str[64] = {
       0,
   };
-  bin_to_hex(
-      str, (unsigned char *) &mel->packet,
-      sizeof(struct mgos_mel_ac_packet_header) + mel->packet.header.data_size + 1);
+  bin_to_hex(str, (unsigned char *) &mel->packet,
+             sizeof(struct mgos_mel_ac_packet_header) +
+                 mel->packet.header.data_size + 1);
   if (mel->handler)
     mel->handler(mel, MGOS_MEL_AC_EV_PACKET_WRITE, (void *) str,
                  mel->handler_user_data);
 
-  mgos_uart_write(
-      mel->uart_no, (uint8_t *) &mel->packet,
-      sizeof(struct mgos_mel_ac_packet_header) + mel->packet.header.data_size + 1);
+  mgos_uart_write(mel->uart_no, (uint8_t *) &mel->packet,
+                  sizeof(struct mgos_mel_ac_packet_header) +
+                      mel->packet.header.data_size + 1);
   mgos_uart_flush(mel->uart_no);
   mel->last_send = mgos_uptime_micros();
 }
 
 static bool mgos_mel_ac_params_changed(struct mgos_mel_ac *mel,
-                                    struct mgos_mel_ac_params *params) {
+                                       struct mgos_mel_ac_params *params) {
   return (mel->params.power != params->power ||
           mel->params.mode != params->mode ||
           mel->params.setpoint != params->setpoint ||
@@ -91,7 +91,7 @@ static bool mgos_mel_ac_params_changed(struct mgos_mel_ac *mel,
 }
 
 static bool mgos_mel_ac_timers_changed(struct mgos_mel_ac *mel,
-                                    struct mgos_mel_ac_timers *timers) {
+                                       struct mgos_mel_ac_timers *timers) {
   return (mel->timers.mode != timers->mode ||
           mel->timers.on_set != timers->on_set ||
           mel->timers.off_set != timers->off_set ||
@@ -134,12 +134,12 @@ static void mgos_mel_ac_packet_handle(struct mgos_mel_ac *mel) {
       }
       case MGOS_MEL_AC_PACKET_TYPE_GET_PARAMS: {
         struct mgos_mel_ac_params params = {MGOS_MEL_AC_PARAM_POWER_OFF,
-                                         MGOS_MEL_AC_PARAM_MODE_CURRENT,
-                                         0.00,
-                                         MGOS_MEL_AC_PARAM_FAN_AUTO,
-                                         MGOS_MEL_AC_PARAM_VANE_VERT_AUTO,
-                                         MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO,
-                                         MGOS_MEL_AC_PARAM_ISEE_OFF};
+                                            MGOS_MEL_AC_PARAM_MODE_CURRENT,
+                                            0.00,
+                                            MGOS_MEL_AC_PARAM_FAN_AUTO,
+                                            MGOS_MEL_AC_PARAM_VANE_VERT_AUTO,
+                                            MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO,
+                                            MGOS_MEL_AC_PARAM_ISEE_OFF};
         // uint16_t control_mask = mel->packet.data[0] | (mel->packet.data[1] <<
         // 8);
         params.power = mel->packet.data[2];
@@ -395,8 +395,8 @@ void mgos_mel_ac_params_update(struct mgos_mel_ac *mel) {
   mel->packet.data[1] = (uint8_t)(control >> 8) & 0xFF;
 
   mgos_mel_ac_packet_send(mel, MGOS_MEL_AC_PACKET_FLAGS_SET,
-                       MGOS_MEL_AC_PACKET_TYPE_SET_PARAMS,
-                       MGOS_MEL_AC_PACKET_DATA_SIZE);
+                          MGOS_MEL_AC_PACKET_TYPE_SET_PARAMS,
+                          MGOS_MEL_AC_PACKET_DATA_SIZE);
 }
 
 void mgos_mel_ac_ext_temp_update(struct mgos_mel_ac *mel) {
@@ -414,8 +414,8 @@ void mgos_mel_ac_ext_temp_update(struct mgos_mel_ac *mel) {
   mel->packet.data[1] = (uint8_t)(control >> 8) & 0xFF;
 
   mgos_mel_ac_packet_send(mel, MGOS_MEL_AC_PACKET_FLAGS_SET,
-                       MGOS_MEL_AC_PACKET_TYPE_SET_PARAMS,
-                       MGOS_MEL_AC_PACKET_DATA_SIZE);
+                          MGOS_MEL_AC_PACKET_TYPE_SET_PARAMS,
+                          MGOS_MEL_AC_PACKET_DATA_SIZE);
 }
 
 static void mgos_mel_ac_uart_dispatcher(int uart_no, void *arg) {
@@ -475,138 +475,200 @@ err:
   return NULL;
 }
 
-void mgos_mel_ac_set_power(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_power power) {
-  if (!mel) return;
-  mel->new_params.power = power;
-  mel->set_params = true;
+bool mgos_mel_ac_set_power(struct mgos_mel_ac *mel,
+                           enum mgos_mel_ac_param_power power) {
+  if (!mel) return false;
+  switch (power) {
+    case MGOS_MEL_AC_PARAM_POWER_OFF:
+    case MGOS_MEL_AC_PARAM_POWER_ON:
+      mel->new_params.power = power;
+      mel->set_params = true;
+      break;
+    default:
+      return false;
+  }
 }
 
-void mgos_mel_ac_set_mode(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_mode mode) {
-  if (!mel) return;
-  mel->new_params.mode = mode;
-  mel->set_params = true;
+bool mgos_mel_ac_set_mode(struct mgos_mel_ac *mel,
+                          enum mgos_mel_ac_param_mode mode) {
+  if (!mel) return false;
+  switch (mode) {
+    case MGOS_MEL_AC_PARAM_MODE_CURRENT:
+    case MGOS_MEL_AC_PARAM_MODE_AUTO:
+    case MGOS_MEL_AC_PARAM_MODE_COOL:
+    case MGOS_MEL_AC_PARAM_MODE_DRY:
+    case MGOS_MEL_AC_PARAM_MODE_FAN:
+    case MGOS_MEL_AC_PARAM_MODE_HEAT:
+      mel->new_params.mode = mode;
+      mel->set_params = true;
+      break;
+    default:
+      return false;
+  }
 }
 
-void mgos_mel_ac_set_setpoint(struct mgos_mel_ac *mel, float setpoint) {
-  if (!mel) return;
+bool mgos_mel_ac_set_setpoint(struct mgos_mel_ac *mel, float setpoint) {
+  if (!mel) return false;
+  if (setpoint > 31 || setpoint < 10) return false;
   mel->new_params.setpoint = round(setpoint * 2) / 2;
   mel->set_params = true;
 }
 
-void mgos_mel_ac_set_ext_temp(struct mgos_mel_ac *mel, float temp) {
-  if (!mel) return;
+bool mgos_mel_ac_set_ext_temp(struct mgos_mel_ac *mel, float temp) {
+  if (!mel) return false;
+  if (temp > 41 || temp < 0) return false;
   mel->ext_temperature = round(temp * 2) / 2;
   mel->set_ext_temp = true;
 }
 
-void mgos_mel_ac_set_fan(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_fan fan) {
-  if (!mel) return;
-  mel->new_params.fan = fan;
-  mel->set_params = true;
+bool mgos_mel_ac_set_fan(struct mgos_mel_ac *mel,
+                         enum mgos_mel_ac_param_fan fan) {
+  if (!mel) return false;
+  switch (fan) {
+    case MGOS_MEL_AC_PARAM_FAN_AUTO:
+    case MGOS_MEL_AC_PARAM_FAN_HIGH:
+    case MGOS_MEL_AC_PARAM_FAN_LOW:
+    case MGOS_MEL_AC_PARAM_FAN_MED:
+    case MGOS_MEL_AC_PARAM_FAN_QUIET:
+    case MGOS_MEL_AC_PARAM_FAN_TURBO:
+      mel->new_params.fan = fan;
+      mel->set_params = true;
+      break;
+    default:
+      return false;
+  }
 }
 
-void mgos_mel_ac_set_vane_vert(struct mgos_mel_ac *mel,
-                            enum mgos_mel_ac_param_vane_vert vane_vert) {
-  if (!mel) return;
-  mel->new_params.vane_vert = vane_vert;
-  mel->set_params = true;
+bool mgos_mel_ac_set_vane_vert(struct mgos_mel_ac *mel,
+                               enum mgos_mel_ac_param_vane_vert vane_vert) {
+  if (!mel) return false;
+  switch (vane_vert) {
+    case MGOS_MEL_AC_PARAM_VANE_VERT_AUTO:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_1:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_2:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_3:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_4:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_5:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_SWING:
+      mel->new_params.vane_vert = vane_vert;
+      mel->set_params = true;
+      break;
+    default:
+      return false;
+  }
 }
 
-void mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
-                             enum mgos_mel_ac_param_vane_horiz vane_horiz) {
-  if (!mel) return;
-  mel->new_params.vane_horiz = vane_horiz;
-  mel->set_params = true;
-}
+bool mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
+                                enum mgos_mel_ac_param_vane_horiz vane_horiz) {
+  if (!mel) return false;
+  switch (vane_horiz) {
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_CENTER:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFT:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFTEST:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFTRIGHT:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_RIGHT:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_RIGHTEST:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_SWING:
+      mel->new_params.vane_horiz = vane_horiz;
+      mel->set_params = true;
+      break;
+    default:
+      return false;
+  }
 
-void mgos_mel_ac_set_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *params) {
-  if (!mel) return;
-  mel->new_params = *params;
-  mel->set_params = true;
-}
+  void mgos_mel_ac_set_params(struct mgos_mel_ac * mel,
+                              struct mgos_mel_ac_params * params) {
+    if (!mel) return;
+    mel->new_params = *params;
+    mel->set_params = true;
+  }
 
-enum mgos_mel_ac_param_power mgos_mel_ac_get_power(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->params.power;
-  else
-    return MGOS_MEL_AC_PARAM_POWER_OFF;
-}
+  enum mgos_mel_ac_param_power mgos_mel_ac_get_power(struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->params.power;
+    else
+      return MGOS_MEL_AC_PARAM_POWER_OFF;
+  }
 
-enum mgos_mel_ac_param_mode mgos_mel_ac_get_mode(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->params.mode;
-  else
-    return MGOS_MEL_AC_PARAM_MODE_CURRENT;
-}
+  enum mgos_mel_ac_param_mode mgos_mel_ac_get_mode(struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->params.mode;
+    else
+      return MGOS_MEL_AC_PARAM_MODE_CURRENT;
+  }
 
-float mgos_mel_ac_get_setpoint(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->params.setpoint;
-  else
-    return 0.0;
-}
+  float mgos_mel_ac_get_setpoint(struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->params.setpoint;
+    else
+      return 0.0;
+  }
 
-enum mgos_mel_ac_param_fan mgos_mel_ac_get_fan(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->params.fan;
-  else
-    return MGOS_MEL_AC_PARAM_FAN_AUTO;
-}
+  enum mgos_mel_ac_param_fan mgos_mel_ac_get_fan(struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->params.fan;
+    else
+      return MGOS_MEL_AC_PARAM_FAN_AUTO;
+  }
 
-enum mgos_mel_ac_param_vane_vert mgos_mel_ac_get_vane_vert(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->params.vane_vert;
-  else
-    return MGOS_MEL_AC_PARAM_VANE_VERT_AUTO;
-}
+  enum mgos_mel_ac_param_vane_vert mgos_mel_ac_get_vane_vert(
+      struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->params.vane_vert;
+    else
+      return MGOS_MEL_AC_PARAM_VANE_VERT_AUTO;
+  }
 
-enum mgos_mel_ac_param_vane_horiz mgos_mel_ac_get_vane_horiz(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->params.vane_horiz;
-  else
-    return MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO;
-}
+  enum mgos_mel_ac_param_vane_horiz mgos_mel_ac_get_vane_horiz(
+      struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->params.vane_horiz;
+    else
+      return MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO;
+  }
 
-bool mgos_mel_ac_param_get_isee(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->params.isee;
-  else
-    return false;
-}
+  bool mgos_mel_ac_param_get_isee(struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->params.isee;
+    else
+      return false;
+  }
 
-void mgos_mel_ac_get_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *params) {
-  if (!mel || !params) return;
-  *params = mel->params;
-}
+  void mgos_mel_ac_get_params(struct mgos_mel_ac * mel,
+                              struct mgos_mel_ac_params * params) {
+    if (!mel || !params) return;
+    *params = mel->params;
+  }
 
-bool mgos_mel_ac_get_operating(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->operating;
-  else
-    return false;
-}
+  bool mgos_mel_ac_get_operating(struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->operating;
+    else
+      return false;
+  }
 
-float mgos_mel_ac_get_room_temperature(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->room_temperature;
-  else
-    return 0.0;
-}
+  float mgos_mel_ac_get_room_temperature(struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->room_temperature;
+    else
+      return 0.0;
+  }
 
-bool mgos_mel_ac_connected(struct mgos_mel_ac *mel) {
-  if (mel)
-    return mel->connected;
-  else
-    return false;
-}
+  bool mgos_mel_ac_connected(struct mgos_mel_ac * mel) {
+    if (mel)
+      return mel->connected;
+    else
+      return false;
+  }
 
-void mgos_mel_ac_destroy(struct mgos_mel_ac **mel) {
-  LOG(LL_DEBUG, ("Destroing MEL object...."));
-  if (*mel) free((*mel));
-  *mel = NULL;
-  return;
-}
+  void mgos_mel_ac_destroy(struct mgos_mel_ac * *mel) {
+    LOG(LL_DEBUG, ("Destroing MEL object...."));
+    if (*mel) free((*mel));
+    *mel = NULL;
+    return;
+  }
 
-bool mgos_mel_ac_init(void) {
-  return true;
-}
+  bool mgos_mel_ac_init(void) {
+    return true;
+  }

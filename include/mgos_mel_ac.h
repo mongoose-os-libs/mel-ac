@@ -167,14 +167,14 @@ void mgos_mel_ac_disconnect(struct mgos_mel_ac *mel);
 void mgos_mel_ac_packet_send(struct mgos_mel_ac *mel, uint8_t flags,
                           enum mgos_mel_ac_packet_type type, uint8_t size);
 // Setters
-void mgos_mel_ac_set_power(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_power power);
-void mgos_mel_ac_set_mode(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_mode mode);
-void mgos_mel_ac_set_setpoint(struct mgos_mel_ac *mel, float setpoint);
-void mgos_mel_ac_set_ext_temp(struct mgos_mel_ac *mel, float temp);
-void mgos_mel_ac_set_fan(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_fan fan);
-void mgos_mel_ac_set_vane_vert(struct mgos_mel_ac *mel,
+bool mgos_mel_ac_set_power(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_power power);
+bool mgos_mel_ac_set_mode(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_mode mode);
+bool mgos_mel_ac_set_setpoint(struct mgos_mel_ac *mel, float setpoint);
+bool mgos_mel_ac_set_ext_temp(struct mgos_mel_ac *mel, float temp);
+bool mgos_mel_ac_set_fan(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_fan fan);
+bool mgos_mel_ac_set_vane_vert(struct mgos_mel_ac *mel,
                             enum mgos_mel_ac_param_vane_vert vane_vert);
-void mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
+bool mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
                              enum mgos_mel_ac_param_vane_horiz vane_horiz);
 void mgos_mel_ac_set_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *params);
 // Getters
