@@ -46,21 +46,21 @@ struct mgos_mel_ac_packet_header {
   uint8_t data_size;
 };
 
-struct __attribute__((__packed__)) mgos_mel_ac_packet_control {
-  uint16_t control;  // __attribute__((packed));
-  uint8_t power;
-  uint8_t mode;
-  uint8_t temp;
-  uint8_t fan;
-  uint8_t vane_vert;
-  uint8_t reserved0;
-  uint8_t reserved1;
-  uint8_t reserved2;
-  uint8_t reserved3;
-  uint8_t reserved4;
-  uint8_t vane_horiz;
-  uint8_t temp1;
-};
+// struct __attribute__((__packed__)) mgos_mel_ac_packet_control {
+//   uint16_t control;  // __attribute__((packed));
+//   uint8_t power;
+//   uint8_t mode;
+//   uint8_t temp;
+//   uint8_t fan;
+//   uint8_t vane_vert;
+//   uint8_t reserved0;
+//   uint8_t reserved1;
+//   uint8_t reserved2;
+//   uint8_t reserved3;
+//   uint8_t reserved4;
+//   uint8_t vane_horiz;
+//   uint8_t temp1;
+// };
 
 struct mgos_mel_ac_packet {
   struct mgos_mel_ac_packet_header header;
@@ -112,16 +112,10 @@ struct mgos_mel_ac {
   bool operating;  // if true, the MEL is operating to reach the desired
                    // temperature
 
-  mgos_mel_ac_ev_handler handler;
-  void *handler_user_data;
-
   // Service
   int svc_timer_id;
   uint16_t svc_period_ms;
 };
-
-void mgos_mel_ac_params_update(struct mgos_mel_ac *mel);
-void mgos_mel_ac_ext_temp_update(struct mgos_mel_ac *mel);
 
 #ifdef __cplusplus
 }

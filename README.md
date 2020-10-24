@@ -29,7 +29,7 @@ More details available on [MELCloud](https://innovations.mitsubishi-les.com/en/c
 
 ## Mounting
 
-```IMPORTANT:``` When mounting the ```MEC-AC``` unit inside an indoor unit, refer to the installation manual of the indoor unit. 
+***IMPORTANT:*** When mounting the ```MEC-AC``` unit inside an indoor unit, refer to the installation manual of the indoor unit. 
 Do not mount the Interface unit inside the indoor unit, if not mentioned
 
 ```AC```'s indoor unit mount:
@@ -43,7 +43,18 @@ Do not mount the Interface unit inside the indoor unit, if not mentioned
 
 ## Software
 
-The `mgos_mel_ac_svc_init()` make a timer is set up at `period_ms` milliseconds intervals to handle the device.
+### Comfig chema
+
+```javascript
+"mel_ac": {
+  "enable": true,         // Enable MEL-AC library
+  "uart_no": 0,           // UART number
+  "uart_baud_rate": 2400, // Do not change this, unless required
+  "period_ms": 250        // Packets handler timer, ms
+}
+```
+
+The library init makes a timer is set up at `period_ms` milliseconds intervals to handle the device.
 The handler quering the HVAC params in a loop and sends new params when there are changes happen.
 
 A callback handler in `struct mgos_mel_ac_cfg` receives event callbacks as follows:
@@ -64,21 +75,19 @@ A callback handler in `struct mgos_mel_ac_cfg` receives event callbacks as follo
 To read params from HVAC:
 
 ```c
-void mgos_mel_ac_get_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *params);
+void mgos_mel_ac_get_params(struct mgos_mel_ac_params *params);
 ```
 To write params to HVAC:
 
 ```c
-bool mgos_mel_ac_set_power(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_power power);
-bool mgos_mel_ac_set_mode(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_mode mode);
-bool mgos_mel_ac_set_setpoint(struct mgos_mel_ac *mel, float setpoint);
-bool mgos_mel_ac_set_ext_temp(struct mgos_mel_ac *mel, float temp);
-bool mgos_mel_ac_set_fan(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_fan fan);
-bool mgos_mel_ac_set_vane_vert(struct mgos_mel_ac *mel,
-                            enum mgos_mel_ac_param_vane_vert vane_vert);
-bool mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
-                             enum mgos_mel_ac_param_vane_horiz vane_horiz);
-void mgos_mel_ac_set_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *params);
+bool mgos_mel_ac_set_power(enum mgos_mel_ac_param_power power);
+bool mgos_mel_ac_set_mode(enum mgos_mel_ac_param_mode mode);
+bool mgos_mel_ac_set_setpoint(float setpoint);
+bool mgos_mel_ac_set_ext_temp(float temp);
+bool mgos_mel_ac_set_fan(enum mgos_mel_ac_param_fan fan);
+bool mgos_mel_ac_set_vane_vert(enum mgos_mel_ac_param_vane_vert vane_vert);
+bool mgos_mel_ac_set_vane_horiz(enum mgos_mel_ac_param_vane_horiz vane_horiz);
+void mgos_mel_ac_set_params(struct mgos_mel_ac_params *params);
 ```
 
 Setter function returns `false` in case of invalid argument values

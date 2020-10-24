@@ -1,7 +1,7 @@
 author: d4rkmen <darkmen@i.ua>
-description: Library that implements Mitsubishi Electric AirCo and HeatPump communication by UART
+description: Library that implements Mitsubishi Electric AC and ATW unit communication by UART
 type: lib
-version: 1.0
+version: 1.1
 
 tags:
   - c
@@ -14,6 +14,11 @@ includes:
   - include
 
 config_schema:
+  - ["mel_ac", "o", {title: "MEL-AC settings"}]
+  - ["mel_ac.enable", "b", true, {title: "Enable MEL-AC"}]
+  - ["mel_ac.uart_no", "i", 0, {title: "UART number"}]
+  - ["mel_ac.uart_baud_rate", "i", 2400, {title: "UART baud rate"}]
+  - ["mel_ac.period_ms", "i", 250, {title: "Service timer"}]
 
 libs:
 

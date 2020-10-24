@@ -25,33 +25,23 @@
 extern "C" {
 #endif
 
-#define MGOS_MEL_AC_OK 0
-#define MGOS_MEL_AC_PACKETRECIEVEERR 1
-#define MGOS_MEL_AC_TIMEOUT 2
-#define MGOS_MEL_AC_ERROR 3
+#define MGOS_MEL_AC_EV_BASE MGOS_EVENT_BASE('M', 'E', 'L')
+#define MGOS_EVENT_GRP_MEL_AC MGOS_MEL_AC_EV_BASE
 
-#define MGOS_MEL_AC_EV_NONE 0
-#define MGOS_MEL_AC_EV_INITIALIZED 1
-#define MGOS_MEL_AC_EV_CONNECTED 2
-#define MGOS_MEL_AC_EV_PACKET_WRITE 3
-#define MGOS_MEL_AC_EV_PACKET_READ 4
-#define MGOS_MEL_AC_EV_PACKET_READ_ERROR 5
-#define MGOS_MEL_AC_EV_PARAMS_CHANGED 6
-#define MGOS_MEL_AC_EV_ROOMTEMP_CHANGED 7
-#define MGOS_MEL_AC_EV_TIMERS_CHANGED 8
-#define MGOS_MEL_AC_EV_OPERATING_CHANGED 9
-#define MGOS_MEL_AC_EV_PARAMS_SET 10
-#define MGOS_MEL_AC_EV_TIMER 11
-#define MGOS_MEL_AC_EV_RX_COUNT 12
-#define MGOS_MEL_AC_EV_CONNECT_ERROR 13
-
-#define MGOS_MEL_AC_POWER_OFF 0x00
-#define MGOS_MEL_AC_POWER_ON 0x01
-
-enum mgos_mel_ac_param {
-  MGOS_MEL_AC_PARAM_BAUDRATE = 4,
-  MGOS_MEL_AC_SECURITY_LEVEL,
-  MGOS_MEL_AC_PARAM_DATAPACKET_LENGTH
+enum mgos_mel_ac_event {
+  MGOS_MEL_AC_EV_INITIALIZED = MGOS_MEL_AC_EV_BASE,
+  MGOS_MEL_AC_EV_CONNECTED,
+  MGOS_MEL_AC_EV_PACKET_WRITE,
+  MGOS_MEL_AC_EV_PACKET_READ,
+  MGOS_MEL_AC_EV_PACKET_READ_ERROR,
+  MGOS_MEL_AC_EV_PARAMS_CHANGED,
+  MGOS_MEL_AC_EV_ROOMTEMP_CHANGED,
+  MGOS_MEL_AC_EV_TIMERS_CHANGED,
+  MGOS_MEL_AC_EV_OPERATING_CHANGED,
+  MGOS_MEL_AC_EV_PARAMS_SET,
+  MGOS_MEL_AC_EV_TIMER,
+  MGOS_MEL_AC_EV_RX_COUNT,
+  MGOS_MEL_AC_EV_CONNECT_ERROR
 };
 
 enum mgos_mel_ac_param_power {
@@ -117,26 +107,11 @@ enum mgos_mel_ac_packet_type {
   MGOS_MEL_AC_PACKET_TYPE_GET_TEMP = 3,    // Get room temperature
   MGOS_MEL_AC_PACKET_TYPE_UNKNOWN = 4,     // Set HVAC timers?
   MGOS_MEL_AC_PACKET_TYPE_GET_TIMERS = 5,  // Get timer settings from HVAC
-  MGOS_MEL_AC_PACKET_TYPE_GET_OPERATING = 6,  // HVAC is idle or operatingt to reach setpoint
-  MGOS_MEL_AC_PACKET_TYPE_SET_TEMP = 7,   // Report room temp from external sensor
+  MGOS_MEL_AC_PACKET_TYPE_GET_OPERATING =
+      6,  // HVAC is idle or operatingt to reach setpoint
+  MGOS_MEL_AC_PACKET_TYPE_SET_TEMP =
+      7,  // Report room temp from external sensor
   MGOS_MEL_AC_PACKET_TYPE_CONNECT = 0xCA  // Handshake packet
-};
-
-struct mgos_mel_ac;
-typedef void (*mgos_mel_ac_ev_handler)(struct mgos_mel_ac *mel, int ev, void *ev_data,
-                                    void *user_data);
-
-struct mgos_mel_ac_cfg {
-  uint32_t password;
-  uint32_t address;
-  uint8_t uart_no;
-  uint32_t uart_baud_rate;
-
-  // User callback event handler
-  mgos_mel_ac_ev_handler handler;
-  void *handler_user_data;
-
-  int timeout_secs;
 };
 
 struct mgos_mel_ac_timers {
@@ -157,42 +132,37 @@ struct mgos_mel_ac_params {
   enum mgos_mel_ac_param_isee isee;              // iSee sensor status. readonly
 };
 
-void mgos_mel_ac_config_set_defaults(struct mgos_mel_ac_cfg *cfg);
+void mgos_mel_ac_create();
+void mgos_mel_ac_destroy();
 
-struct mgos_mel_ac *mgos_mel_ac_create(struct mgos_mel_ac_cfg *cfg);
-void mgos_mel_ac_destroy(struct mgos_mel_ac **mel);
-
-void mgos_mel_ac_connect(struct mgos_mel_ac *mel);
-void mgos_mel_ac_disconnect(struct mgos_mel_ac *mel);
-void mgos_mel_ac_packet_send(struct mgos_mel_ac *mel, uint8_t flags,
-                          enum mgos_mel_ac_packet_type type, uint8_t size);
+void mgos_mel_ac_connect();
+void mgos_mel_ac_disconnect();
+void mgos_mel_ac_packet_send(uint8_t flags, enum mgos_mel_ac_packet_type type,
+                             uint8_t size);
 // Setters
-bool mgos_mel_ac_set_power(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_power power);
-bool mgos_mel_ac_set_mode(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_mode mode);
-bool mgos_mel_ac_set_setpoint(struct mgos_mel_ac *mel, float setpoint);
-bool mgos_mel_ac_set_ext_temp(struct mgos_mel_ac *mel, float temp);
-bool mgos_mel_ac_set_fan(struct mgos_mel_ac *mel, enum mgos_mel_ac_param_fan fan);
-bool mgos_mel_ac_set_vane_vert(struct mgos_mel_ac *mel,
-                            enum mgos_mel_ac_param_vane_vert vane_vert);
-bool mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
-                             enum mgos_mel_ac_param_vane_horiz vane_horiz);
-void mgos_mel_ac_set_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *params);
+bool mgos_mel_ac_set_power(enum mgos_mel_ac_param_power power);
+bool mgos_mel_ac_set_mode(enum mgos_mel_ac_param_mode mode);
+bool mgos_mel_ac_set_setpoint(float setpoint);
+bool mgos_mel_ac_set_ext_temp(float temp);
+bool mgos_mel_ac_set_fan(enum mgos_mel_ac_param_fan fan);
+bool mgos_mel_ac_set_vane_vert(enum mgos_mel_ac_param_vane_vert vane_vert);
+bool mgos_mel_ac_set_vane_horiz(enum mgos_mel_ac_param_vane_horiz vane_horiz);
+void mgos_mel_ac_set_params(struct mgos_mel_ac_params *params);
 // Getters
-enum mgos_mel_ac_param_power mgos_mel_ac_get_power(struct mgos_mel_ac *mel);
-enum mgos_mel_ac_param_mode mgos_mel_ac_get_mode(struct mgos_mel_ac *mel);
-float mgos_mel_ac_get_setpoint(struct mgos_mel_ac *mel);
-enum mgos_mel_ac_param_fan mgos_mel_ac_get_fan(struct mgos_mel_ac *mel);
-enum mgos_mel_ac_param_vane_vert mgos_mel_ac_get_vane_vert(struct mgos_mel_ac *mel);
-enum mgos_mel_ac_param_vane_horiz mgos_mel_ac_get_vane_horiz(struct mgos_mel_ac *mel);
-bool mgos_mel_ac_get_isee(struct mgos_mel_ac *mel);
-bool mgos_mel_ac_get_operating(struct mgos_mel_ac *mel);
-void mgos_mel_ac_get_params(struct mgos_mel_ac *mel, struct mgos_mel_ac_params *params);
-float mgos_mel_ac_get_room_temperature(struct mgos_mel_ac *mel);
-bool mgos_mel_ac_connected(struct mgos_mel_ac *mel);
-// service
-bool mgos_mel_ac_svc_init(struct mgos_mel_ac *mel, uint16_t period_ms);
+enum mgos_mel_ac_param_power mgos_mel_ac_get_power();
+enum mgos_mel_ac_param_mode mgos_mel_ac_get_mode();
+float mgos_mel_ac_get_setpoint();
+enum mgos_mel_ac_param_fan mgos_mel_ac_get_fan();
+enum mgos_mel_ac_param_vane_vert mgos_mel_ac_get_vane_vert();
+enum mgos_mel_ac_param_vane_horiz mgos_mel_ac_get_vane_horiz();
+bool mgos_mel_ac_get_isee();
+bool mgos_mel_ac_get_operating();
+void mgos_mel_ac_get_params(struct mgos_mel_ac_params *params);
+float mgos_mel_ac_get_room_temperature();
+bool mgos_mel_ac_get_connected();
 // library
 bool mgos_mel_ac_init(void);
+void mgos_mel_ac_deinit(void);
 
 #ifdef __cplusplus
 }
