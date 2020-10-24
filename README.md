@@ -11,8 +11,7 @@ The protocol was sniffed from original `Mitsubishi MAC-567IF-E` controller:
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/MAC-567IF-E.png"/>
 
 Mitsubishi indoor unit's control board has ***CN105*** (RED) connector for communication purposes.
-The communication performed by UART @ 2400 8E1 (5V TTL)
-The ***CN105*** connector pinouts (1..5) = RX, TX, 5V, GND, 12V
+The communication performed by UART @ 2400 8E1 (5V TTL). The ***CN105*** connector pinouts (1..5) = 12V, GND, 5V,TX, RX
 
 ### RobotDyn WiFi-NodeM
 
@@ -26,6 +25,13 @@ Case 3D design for WiFi-NodeM:
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-esp-01.png"/>
 
+## Compatability
+
+All model coming with ***CN105*** on an indoor unit's board, except PCA-RP71HAQ, PEA-RP400GAQ and PEA-RP500GAQ
+
+More details available on [MELCloud](https://innovations.mitsubishi-les.com/en/controls/wifi-adapter) and [KumoCloud](https://www.mitsubishicomfort.com/kumocloud/compatibility) pages
+
+## Mounting
 
 ```IMPORTANT:``` When mounting the ```MEC-AC``` unit inside an indoor unit, refer to the installation manual of the indoor unit. 
 Do not mount the Interface unit inside the indoor unit, if not mentioned
