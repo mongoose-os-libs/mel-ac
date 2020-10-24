@@ -483,7 +483,7 @@ bool mgos_mel_ac_set_power(struct mgos_mel_ac *mel,
     case MGOS_MEL_AC_PARAM_POWER_ON:
       mel->new_params.power = power;
       mel->set_params = true;
-      break;
+      return true;
     default:
       return false;
   }
@@ -501,7 +501,7 @@ bool mgos_mel_ac_set_mode(struct mgos_mel_ac *mel,
     case MGOS_MEL_AC_PARAM_MODE_HEAT:
       mel->new_params.mode = mode;
       mel->set_params = true;
-      break;
+      return true;
     default:
       return false;
   }
@@ -512,6 +512,7 @@ bool mgos_mel_ac_set_setpoint(struct mgos_mel_ac *mel, float setpoint) {
   if (setpoint > 31 || setpoint < 10) return false;
   mel->new_params.setpoint = round(setpoint * 2) / 2;
   mel->set_params = true;
+  return true;
 }
 
 bool mgos_mel_ac_set_ext_temp(struct mgos_mel_ac *mel, float temp) {
@@ -519,6 +520,7 @@ bool mgos_mel_ac_set_ext_temp(struct mgos_mel_ac *mel, float temp) {
   if (temp > 41 || temp < 0) return false;
   mel->ext_temperature = round(temp * 2) / 2;
   mel->set_ext_temp = true;
+  return true;
 }
 
 bool mgos_mel_ac_set_fan(struct mgos_mel_ac *mel,
@@ -533,7 +535,7 @@ bool mgos_mel_ac_set_fan(struct mgos_mel_ac *mel,
     case MGOS_MEL_AC_PARAM_FAN_TURBO:
       mel->new_params.fan = fan;
       mel->set_params = true;
-      break;
+      return true;
     default:
       return false;
   }
@@ -552,7 +554,7 @@ bool mgos_mel_ac_set_vane_vert(struct mgos_mel_ac *mel,
     case MGOS_MEL_AC_PARAM_VANE_VERT_SWING:
       mel->new_params.vane_vert = vane_vert;
       mel->set_params = true;
-      break;
+      return true;
     default:
       return false;
   }
@@ -572,7 +574,7 @@ bool mgos_mel_ac_set_vane_horiz(struct mgos_mel_ac *mel,
     case MGOS_MEL_AC_PARAM_VANE_HORIZ_SWING:
       mel->new_params.vane_horiz = vane_horiz;
       mel->set_params = true;
-      break;
+      return true;
     default:
       return false;
   }
