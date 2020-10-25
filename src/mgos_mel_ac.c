@@ -409,7 +409,7 @@ void mgos_mel_ac_create() {
   LOG(LL_DEBUG, ("Creating MEL-AC object..."));
   struct mgos_uart_config ucfg;
   mel = calloc(1, sizeof(struct mgos_mel_ac));
-  if (!mel) return NULL;
+  if (!mel) return;
   // Init all the structure members
   memset((void *) mel, 0, sizeof(struct mgos_mel_ac));
 
