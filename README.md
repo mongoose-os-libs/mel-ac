@@ -60,6 +60,107 @@ Do not mount the Interface unit inside the indoor unit, if not mentioned
 }
 ```
 
+### RPC
+
+If RPC is present in your project, MEL-AC will add it's command handlers
+
+```javascript
+$ mos --port mqtt://192.168.1.9/esp32_585E14 call RPC.list
+[
+    "MEL-AC.SetParams",
+    "MEL-AC.GetParams",
+    "Sys.SetDebug",
+    "Sys.GetInfo",
+    "Sys.Reboot",
+    "RPC.Ping",
+    "RPC.Describe",
+    "RPC.List"
+]
+```
+#### Read current params from HVAC
+
+##### WebSockets
+
+```javascript
+$ mos call --port ws://192.168.1.216/rpc MEL-AC.GetParams
+{
+"connected": true,
+"power": 0,
+"mode": 3,
+"setpoint": 21.0,
+"fan": 3,
+"vane_vert": 0,
+"vane_horiz": 3,
+"isee": true,
+"operating": false,
+"room": 25.0
+}
+```
+##### HTTP
+
+```javascript
+http://192.168.1.216/rpc/MEL-AC.GetParams
+{"connected": true, "power": 0, "mode": 1, "setpoint": 20.0, "fan": 2, "vane_vert": 0, "vane_horiz": 3, "isee": true, "operating": false, "room": 22.0}
+```
+
+##### MQTT
+
+```javascript
+$ mos --port mqtt://192.168.1.9/esp32_585E14 call MEL-AC.GetParams 
+{
+"connected": true,
+"power": 0,
+"mode": 3,
+"setpoint": 21.0,
+"fan": 3,
+"vane_vert": 0,
+"vane_horiz": 3,
+"isee": true,
+"operating": false,
+"room": 25.0
+}
+```
+
+#### Set new params to HVAC
+
+##### WebSockets
+
+```javascript
+$ mos call --port ws://192.168.1.216/rpc MEL-AC.SetParams '{"mode":1,"fan":2,"setpoint":20}'
+{
+  "success": true,
+  "power": 0,
+  "mode": 1,
+  "setpoint": 20.0,
+  "fan": 2,
+  "vane_vert": 0,
+  "vane_horiz": 3
+}
+```
+##### HTTP
+
+```javascript
+$ curl -d '{"mode":1,"fan":2,"setpoint":20}' 192.168.1.216/rpc/MEL-AC.SetParams
+{"success": true, "power": 0, "mode": 1, "setpoint": 20.0, "fan": 2, "vane_vert": 0, "vane_horiz": 3} 
+```
+
+##### MQTT
+
+```javascript
+$ mos --port mqtt://192.168.1.9/esp32_585E14 call MEL-AC.SetParams '{"power":1,"mode":1,"fan":2,"setpoint":20}'
+{
+  "success": true,
+  "power": 1,
+  "mode": 1,
+  "setpoint": 20.0,
+  "fan": 2,
+  "vane_vert": 0,
+  "vane_horiz": 3
+}
+```
+
+### Primitives
+
 The library init makes a timer is set up at `period_ms` milliseconds intervals to handle the device.
 The handler quering the HVAC params in a loop and sends new params when there are changes happen.
 

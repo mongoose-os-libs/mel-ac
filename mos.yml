@@ -19,8 +19,10 @@ config_schema:
   - ["mel_ac.uart_no", "i", 0, {title: "UART number"}]
   - ["mel_ac.uart_baud_rate", "i", 2400, {title: "UART baud rate"}]
   - ["mel_ac.period_ms", "i", 250, {title: "Service timer"}]
+  - ["mel_ac.rpc_enable", "b", true, {title: "Enable MEL-AC rpc handlers"}]
 
 libs:
+  - origin: https://github.com/mongoose-os-libs/rpc-common
 
 # Used by the mos tool to catch mos binaries incompatible with this file format
 manifest_version: 2020-08-02

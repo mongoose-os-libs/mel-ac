@@ -38,6 +38,8 @@ extern "C" {
 
 #define MGOS_MEL_AC_PACKET_MAX_DATA_SIZE 0x100
 
+#define MGOS_MEL_AC_JSON_SIZE 200
+
 struct mgos_mel_ac_packet_header {
   uint8_t magic;
   uint8_t flags;
