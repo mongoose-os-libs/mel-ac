@@ -56,13 +56,14 @@ Do not mount the Interface unit inside the indoor unit, if not mentioned
   "enable": true,         // Enable MEL-AC library
   "uart_no": 0,           // UART number
   "uart_baud_rate": 2400, // Do not change this, unless required
-  "period_ms": 250        // Packets handler timer, ms
+  "period_ms": 250,       // Packets handler timer, ms
+  "rpc_enable"            // Enable MEL-AC RPC handlers 
 }
 ```
 
 ### RPC
 
-If RPC is present in your project, MEL-AC will add it's command handlers
+If RPC is present in your project, MEL-AC will add it's command handlers: `MEL-AC.GetParams` and `MEL-AC.SetParams` 
 
 ```javascript
 $ mos --port mqtt://192.168.1.9/esp32_585E14 call RPC.list
@@ -161,10 +162,12 @@ $ mos --port mqtt://192.168.1.9/esp32_585E14 call MEL-AC.SetParams '{"power":1,"
 
 ### Primitives
 
-The library init makes a timer is set up at `period_ms` milliseconds intervals to handle the device.
+The library init makes a timer is set up at `mel_ac.period_ms` milliseconds intervals to handle the device.
 The handler quering the HVAC params in a loop and sends new params when there are changes happen.
 
-A callback handler in `struct mgos_mel_ac_cfg` receives event callbacks as follows:
+#### Events
+
+Library triggering events as follows:
 *   `MGOS_MEL_AC_EV_INITIALIZED`: when the service initialized successfully
 *   `MGOS_MEL_AC_EV_CONNECTED`: when `connected` state changed. New state goes to `*ev_data`
 *   `MGOS_MEL_AC_EV_PACKET_WRITE`: after packet sent to HVAC
@@ -179,12 +182,12 @@ A callback handler in `struct mgos_mel_ac_cfg` receives event callbacks as follo
 *   `MGOS_MEL_AC_EV_RX_COUNT`: when have new data to read in UART
 *   `MGOS_MEL_AC_EV_CONNECT_ERROR`: when handshake packet returned error
 
-To read params from HVAC:
+#### To read params from HVAC
 
 ```c
 void mgos_mel_ac_get_params(struct mgos_mel_ac_params *params);
 ```
-To write params to HVAC:
+#### To write params to HVAC
 
 ```c
 bool mgos_mel_ac_set_power(enum mgos_mel_ac_param_power power);
@@ -197,7 +200,7 @@ bool mgos_mel_ac_set_vane_horiz(enum mgos_mel_ac_param_vane_horiz vane_horiz);
 void mgos_mel_ac_set_params(struct mgos_mel_ac_params *params);
 ```
 
-Setter function returns `false` in case of invalid argument values
+Setters return `false` in case of invalid argument value
 
 It's currently tested on ***ESP8266*** and ***ESP32*** platforms
 

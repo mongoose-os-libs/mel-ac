@@ -709,6 +709,7 @@ static void set_params_handler(struct mg_rpc_request_info *ri, void *cb_arg,
       1) {
     if (!mgos_mel_ac_set_vane_horiz(params.vane_horiz)) success = false;
   }
+  mgos_mel_ac_get_params(&params);
   // Not implemented
   // if (json_scanf(args.p, args.len, "{isee: %d}", &params.isee) == 1) {
   // 	mgos_mel_ac_set_isee(mel, params.isee);
