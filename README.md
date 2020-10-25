@@ -13,13 +13,19 @@ The protocol was sniffed from original `Mitsubishi MAC-567IF-E` controller:
 Mitsubishi indoor unit's control board has ***CN105*** (RED) connector for communication purposes.
 The communication performed by UART @ 2400 8E1 (5V TTL). The ***CN105*** connector pinouts (1..5) = 12V, GND, 5V,TX, RX
 
-### RobotDyn WiFi-NodeM
+### RobotDyn WiFi-NodeM (ESP8266)
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-nodem.png"/>
 
-### ESP-01 + 5V adapter
+### ESP-01 + 5V adapter (ESP8266)
 
 <img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-esp-01.png"/>
+
+### Doit.am DevKit V1 (ESP32)
+
+There are `UART0` and `UART2` available for this board
+
+<img src="https://github.com/mongoose-os-libs/mel-ac/blob/master/docs/mel-ac-devkit-v1.png"/>
 
 ## Compatability
 
@@ -92,7 +98,7 @@ void mgos_mel_ac_set_params(struct mgos_mel_ac_params *params);
 
 Setter function returns `false` in case of invalid argument values
 
-It's currently tested on `ESP8266` platform. More is coming
+It's currently tested on ***ESP8266*** and ***ESP32*** platforms
 
 For a complete demonstration of the driver, look at this [Mongoose App](https://github.com/mongoose-os-apps/mel-ac-demo)
 
