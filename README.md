@@ -59,7 +59,7 @@ Do not mount the Interface unit inside the indoor unit, if not mentioned
   "uart_no": 0,           // UART number
   "uart_baud_rate": 2400, // Do not change this, unless required
   "period_ms": 250,       // Packets handler timer, ms
-  "rpc_enable"            // Enable MEL-AC RPC handlers 
+  "rpc_enable": true      // Enable MEL-AC RPC handlers 
 }
 ```
 
