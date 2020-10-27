@@ -55,13 +55,13 @@ void mgos_mel_ac_params_update() {
     mel->packet.data[5] = mel->new_params.fan;
     control |= MGOS_MEL_AC_PACKET_SET_FAN;
   }
-  if (mel->params.vane_vert != mel->new_params.vane_vert) {
-    mel->packet.data[6] = mel->new_params.vane_vert;
-    control |= MGOS_MEL_AC_PACKET_SET_VANE_VERT;
-  }
   if (mel->params.vane_horiz != mel->new_params.vane_horiz) {
-    mel->packet.data[12] = mel->new_params.vane_horiz;
+    mel->packet.data[6] = mel->new_params.vane_horiz;
     control |= MGOS_MEL_AC_PACKET_SET_VANE_HORIZ;
+  }
+  if (mel->params.vane_vert != mel->new_params.vane_vert) {
+    mel->packet.data[12] = mel->new_params.vane_vert;
+    control |= MGOS_MEL_AC_PACKET_SET_VANE_VERT;
   }
   if (!control) return;  // Nothing to set, skipping
   mel->packet.data[0] = (uint8_t) control & 0xFF;
@@ -235,8 +235,8 @@ static void mgos_mel_ac_packet_handle() {
                                             MGOS_MEL_AC_PARAM_MODE_CURRENT,
                                             0.00,
                                             MGOS_MEL_AC_PARAM_FAN_AUTO,
-                                            MGOS_MEL_AC_PARAM_VANE_VERT_AUTO,
                                             MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO,
+                                            MGOS_MEL_AC_PARAM_VANE_VERT_AUTO,
                                             MGOS_MEL_AC_PARAM_ISEE_OFF};
         // uint16_t control_mask = mel->packet.data[0] | (mel->packet.data[1] <<
         // 8);
@@ -251,8 +251,8 @@ static void mgos_mel_ac_packet_handle() {
         }
 
         params.fan = mel->packet.data[5];
-        params.vane_vert = mel->packet.data[6];
-        params.vane_horiz = mel->packet.data[9];
+        params.vane_horiz = mel->packet.data[6];
+        params.vane_vert = mel->packet.data[9];
 
         if (mgos_mel_ac_params_changed(&params)) {
           mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_CHANGED, (void *) &params);
@@ -533,11 +533,12 @@ bool mgos_mel_ac_set_vane_vert(enum mgos_mel_ac_param_vane_vert vane_vert) {
   if (!mel) return false;
   switch (vane_vert) {
     case MGOS_MEL_AC_PARAM_VANE_VERT_AUTO:
-    case MGOS_MEL_AC_PARAM_VANE_VERT_1:
-    case MGOS_MEL_AC_PARAM_VANE_VERT_2:
-    case MGOS_MEL_AC_PARAM_VANE_VERT_3:
-    case MGOS_MEL_AC_PARAM_VANE_VERT_4:
-    case MGOS_MEL_AC_PARAM_VANE_VERT_5:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_LEFTEST:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_LEFT:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_CENTER:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_RIGHT:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_RIGHTEST:
+    case MGOS_MEL_AC_PARAM_VANE_VERT_LEFTRIGHT:
     case MGOS_MEL_AC_PARAM_VANE_VERT_SWING:
       mel->new_params.vane_vert = vane_vert;
       mel->set_params = true;
@@ -551,12 +552,11 @@ bool mgos_mel_ac_set_vane_horiz(enum mgos_mel_ac_param_vane_horiz vane_horiz) {
   if (!mel) return false;
   switch (vane_horiz) {
     case MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO:
-    case MGOS_MEL_AC_PARAM_VANE_HORIZ_CENTER:
-    case MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFT:
-    case MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFTEST:
-    case MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFTRIGHT:
-    case MGOS_MEL_AC_PARAM_VANE_HORIZ_RIGHT:
-    case MGOS_MEL_AC_PARAM_VANE_HORIZ_RIGHTEST:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_1:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_2:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_3:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_4:
+    case MGOS_MEL_AC_PARAM_VANE_HORIZ_5:
     case MGOS_MEL_AC_PARAM_VANE_HORIZ_SWING:
       mel->new_params.vane_horiz = vane_horiz;
       mel->set_params = true;

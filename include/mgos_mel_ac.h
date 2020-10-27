@@ -68,25 +68,25 @@ enum mgos_mel_ac_param_fan {
   MGOS_MEL_AC_PARAM_FAN_TURBO = 6
 };
 
-enum mgos_mel_ac_param_vane_vert {
-  MGOS_MEL_AC_PARAM_VANE_VERT_AUTO = 0,
-  MGOS_MEL_AC_PARAM_VANE_VERT_1 = 1,  // 15 %
-  MGOS_MEL_AC_PARAM_VANE_VERT_2 = 2,  // 30 %
-  MGOS_MEL_AC_PARAM_VANE_VERT_3 = 3,  // 45 %
-  MGOS_MEL_AC_PARAM_VANE_VERT_4 = 4,  // 60 %
-  MGOS_MEL_AC_PARAM_VANE_VERT_5 = 5,  // 75 %
-  MGOS_MEL_AC_PARAM_VANE_VERT_SWING = 7
-};
-
 enum mgos_mel_ac_param_vane_horiz {
   MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO = 0,
-  MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFTEST = 1,
-  MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFT = 2,
-  MGOS_MEL_AC_PARAM_VANE_HORIZ_CENTER = 3,
-  MGOS_MEL_AC_PARAM_VANE_HORIZ_RIGHT = 4,
-  MGOS_MEL_AC_PARAM_VANE_HORIZ_RIGHTEST = 5,
-  MGOS_MEL_AC_PARAM_VANE_HORIZ_LEFTRIGHT = 8,
-  MGOS_MEL_AC_PARAM_VANE_HORIZ_SWING = 12
+  MGOS_MEL_AC_PARAM_VANE_HORIZ_1 = 1,  // 15 %
+  MGOS_MEL_AC_PARAM_VANE_HORIZ_2 = 2,  // 30 %
+  MGOS_MEL_AC_PARAM_VANE_HORIZ_3 = 3,  // 45 %
+  MGOS_MEL_AC_PARAM_VANE_HORIZ_4 = 4,  // 60 %
+  MGOS_MEL_AC_PARAM_VANE_HORIZ_5 = 5,  // 75 %
+  MGOS_MEL_AC_PARAM_VANE_HORIZ_SWING = 7
+};
+
+enum mgos_mel_ac_param_vane_vert {
+  MGOS_MEL_AC_PARAM_VANE_VERT_AUTO = 0,
+  MGOS_MEL_AC_PARAM_VANE_VERT_LEFTEST = 1,
+  MGOS_MEL_AC_PARAM_VANE_VERT_LEFT = 2,
+  MGOS_MEL_AC_PARAM_VANE_VERT_CENTER = 3,
+  MGOS_MEL_AC_PARAM_VANE_VERT_RIGHT = 4,
+  MGOS_MEL_AC_PARAM_VANE_VERT_RIGHTEST = 5,
+  MGOS_MEL_AC_PARAM_VANE_VERT_LEFTRIGHT = 8,
+  MGOS_MEL_AC_PARAM_VANE_VERT_SWING = 12
 };
 
 enum mgos_mel_ac_param_isee {
@@ -127,8 +127,8 @@ struct mgos_mel_ac_params {
   enum mgos_mel_ac_param_mode mode;
   float setpoint;
   enum mgos_mel_ac_param_fan fan;
-  enum mgos_mel_ac_param_vane_vert vane_vert;    // verticalal vane: up-down
-  enum mgos_mel_ac_param_vane_horiz vane_horiz;  // horizontal vane: left-right
+  enum mgos_mel_ac_param_vane_horiz vane_horiz;  // horizontal vane: up-down
+  enum mgos_mel_ac_param_vane_vert vane_vert;    // verticalal vane: left-right
   enum mgos_mel_ac_param_isee isee;              // iSee sensor status. readonly
 };
 
