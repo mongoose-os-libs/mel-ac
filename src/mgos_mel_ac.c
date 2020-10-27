@@ -88,7 +88,7 @@ void mgos_mel_ac_ext_temp_update() {
   mel->packet.data[1] = (uint8_t)(control >> 8) & 0xFF;
 
   mgos_mel_ac_packet_send(MGOS_MEL_AC_PACKET_FLAGS_SET,
-                          MGOS_MEL_AC_PACKET_TYPE_SET_PARAMS,
+                          MGOS_MEL_AC_PACKET_TYPE_SET_TEMP,
                           MGOS_MEL_AC_PACKET_DATA_SIZE);
 }
 
@@ -118,26 +118,25 @@ static void mgos_mel_ac_svc_timer(void *arg) {
     if (now - mel->last_send < MGOS_MEL_AC_CONNECT_DELAY * 1e3) return;
     mgos_mel_ac_connect();
   } else {
+    if (now - mel->last_send < MGOS_MEL_AC_PACKET_SEND_DELAY * 1e3) return;
     if (mel->set_params) {
-      if (now - mel->last_send < MGOS_MEL_AC_PACKET_SEND_DELAY * 1e3 / 2)
-        return;
       mgos_mel_ac_params_update();
-    } else {
-      if (now - mel->last_send < MGOS_MEL_AC_PACKET_SEND_DELAY * 1e3) return;
-      if (mel->set_ext_temp) {
-        mgos_mel_ac_ext_temp_update();
-        return;
-      }
-
-      memset((void *) &mel->packet.data, 0, MGOS_MEL_AC_PACKET_DATA_SIZE);
-      mgos_mel_ac_packet_send(MGOS_MEL_AC_PACKET_FLAGS_GET,
-                              MGOS_MEL_AC_PACKETS_ORDER[mel->packet_index++],
-                              MGOS_MEL_AC_PACKET_DATA_SIZE);
-      if (mel->packet_index >= MGOS_MEL_AC_PACKETS_ORDER_LEN)
-        mel->packet_index = 0;
+      return;
     }
+    if (mel->set_ext_temp) {
+      mgos_mel_ac_ext_temp_update();
+      return;
+    }
+
+    memset((void *) &mel->packet.data, 0, MGOS_MEL_AC_PACKET_DATA_SIZE);
+    mgos_mel_ac_packet_send(MGOS_MEL_AC_PACKET_FLAGS_GET,
+                            MGOS_MEL_AC_PACKETS_ORDER[mel->packet_index++],
+                            MGOS_MEL_AC_PACKET_DATA_SIZE);
+    if (mel->packet_index >= MGOS_MEL_AC_PACKETS_ORDER_LEN)
+      mel->packet_index = 0;
   }
-  return;
+}
+return;
 }
 
 void bin_to_hex(char *to, const unsigned char *p, size_t len) {
@@ -170,7 +169,7 @@ void mgos_mel_ac_packet_send(uint8_t flags, enum mgos_mel_ac_packet_type type,
       sizeof(struct mgos_mel_ac_packet_header) + mel->packet.header.data_size);
 
   // debug
-  char str[64] = {
+  char str[sizeof(struct mgos_mel_ac_packet) * 2] = {
       0,
   };
   bin_to_hex(str, (unsigned char *) &mel->packet,
@@ -227,7 +226,7 @@ static void mgos_mel_ac_packet_handle() {
   if (mel->packet.header.flags & MGOS_MEL_AC_PACKET_FLAGS_GET) {
     switch (mel->packet.type) {
       case MGOS_MEL_AC_PACKET_TYPE_SET_PARAMS: {
-        mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_SET, (void *) &mel->packet);
+        mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_SET, (void *) &mel->params);
         break;
       }
       case MGOS_MEL_AC_PACKET_TYPE_GET_PARAMS: {
@@ -255,9 +254,10 @@ static void mgos_mel_ac_packet_handle() {
         params.vane_vert = mel->packet.data[9];
 
         if (mgos_mel_ac_params_changed(&params)) {
-          mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_CHANGED, (void *) &params);
           mel->params = params;
-          mel->new_params = params;
+          if (!mel->set_params) mel->new_params = params;
+          mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_CHANGED,
+                             (void *) &mel->params);
         }
         return;
       }
@@ -272,9 +272,9 @@ static void mgos_mel_ac_packet_handle() {
         }
 
         if (mel->room_temperature != room_temperature) {
-          mgos_event_trigger(MGOS_MEL_AC_EV_ROOMTEMP_CHANGED,
-                             (void *) &room_temperature);
           mel->room_temperature = room_temperature;
+          mgos_event_trigger(MGOS_MEL_AC_EV_ROOMTEMP_CHANGED,
+                             (void *) &mel->room_temperature);
         }
         return;
       }
@@ -295,8 +295,9 @@ static void mgos_mel_ac_packet_handle() {
         timers.off_left = mel->packet.data[6] * MGOS_MEL_AC_TIMER_MINS;
         // Event for status change
         if (mgos_mel_ac_timers_changed(&timers)) {
-          mgos_event_trigger(MGOS_MEL_AC_EV_TIMERS_CHANGED, (void *) &timers);
           mel->timers = timers;
+          mgos_event_trigger(MGOS_MEL_AC_EV_TIMERS_CHANGED,
+                             (void *) &mel->timers);
         }
         return;
       }
@@ -305,9 +306,9 @@ static void mgos_mel_ac_packet_handle() {
         // Operating
         bool operating = (bool) mel->packet.data[3];
         if (mel->operating != operating) {
-          mgos_event_trigger(MGOS_MEL_AC_EV_OPERATING_CHANGED,
-                             (void *) &operating);
           mel->operating = operating;
+          mgos_event_trigger(MGOS_MEL_AC_EV_OPERATING_CHANGED,
+                             (void *) &mel->operating);
         }
         return;
       }
@@ -327,11 +328,11 @@ static void mgos_mel_ac_packet_handle() {
     }
   }  // if flags
   else if (mel->packet.header.flags & MGOS_MEL_AC_PACKET_FLAGS_SET) {
-    // Set params was successfull ?
-    mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_SET, (void *) &mel->new_params);
     // Save new params here
-    mel->params = mel->new_params;  // or may be we should wait for a sync?
+    mel->params = mel->new_params; 
+    mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_SET, (void *) &mel->params);
     mel->set_params = false;
+    mel->set_ext_temp = false;
   }
 }
 
