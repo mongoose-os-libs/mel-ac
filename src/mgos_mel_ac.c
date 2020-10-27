@@ -135,8 +135,7 @@ static void mgos_mel_ac_svc_timer(void *arg) {
     if (mel->packet_index >= MGOS_MEL_AC_PACKETS_ORDER_LEN)
       mel->packet_index = 0;
   }
-}
-return;
+  return;
 }
 
 void bin_to_hex(char *to, const unsigned char *p, size_t len) {
@@ -329,7 +328,7 @@ static void mgos_mel_ac_packet_handle() {
   }  // if flags
   else if (mel->packet.header.flags & MGOS_MEL_AC_PACKET_FLAGS_SET) {
     // Save new params here
-    mel->params = mel->new_params; 
+    mel->params = mel->new_params;
     mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_SET, (void *) &mel->params);
     mel->set_params = false;
     mel->set_ext_temp = false;
