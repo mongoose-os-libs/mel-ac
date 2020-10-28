@@ -117,25 +117,27 @@ static void mgos_mel_ac_svc_timer(void *arg) {
   if (!mel->connected) {
     if (now - mel->last_send < MGOS_MEL_AC_CONNECT_DELAY * 1e3) return;
     mgos_mel_ac_connect();
-  } else {
-    if (now - mel->last_send < MGOS_MEL_AC_PACKET_SEND_DELAY * 1e3) return;
-    if (mel->set_params) {
-      mgos_mel_ac_params_update();
-      return;
-    }
-    if (mel->set_ext_temp) {
-      mgos_mel_ac_ext_temp_update();
-      return;
-    }
-
-    memset((void *) &mel->packet.data, 0, MGOS_MEL_AC_PACKET_DATA_SIZE);
-    mgos_mel_ac_packet_send(MGOS_MEL_AC_PACKET_FLAGS_GET,
-                            MGOS_MEL_AC_PACKETS_ORDER[mel->packet_index++],
-                            MGOS_MEL_AC_PACKET_DATA_SIZE);
-    if (mel->packet_index >= MGOS_MEL_AC_PACKETS_ORDER_LEN)
-      mel->packet_index = 0;
+    return;
   }
-  return;
+
+  if (now - mel->last_send < MGOS_MEL_AC_PACKET_SEND_DELAY * 1e3) return;
+  
+  if (mel->set_params) {
+    mgos_mel_ac_params_update();
+    mel->packet_index = 0;
+    return;
+  }
+  if (mel->set_ext_temp) {
+    mgos_mel_ac_ext_temp_update();
+    return;
+  }
+
+  memset((void *) &mel->packet.data, 0, MGOS_MEL_AC_PACKET_DATA_SIZE);
+  mgos_mel_ac_packet_send(MGOS_MEL_AC_PACKET_FLAGS_GET,
+                          MGOS_MEL_AC_PACKETS_ORDER[mel->packet_index++],
+                          MGOS_MEL_AC_PACKET_DATA_SIZE);
+
+  if (mel->packet_index >= MGOS_MEL_AC_PACKETS_ORDER_LEN) mel->packet_index = 0;
 }
 
 void bin_to_hex(char *to, const unsigned char *p, size_t len) {
@@ -385,6 +387,7 @@ void mgos_mel_ac_connect() {
   if (!mel) return;
   mel->connected = false;
   mel->set_params = false;
+  mel->set_ext_temp = false;
   mel->packet_index = 0;  // starting the loop
   uint8_t size = 0;
   mel->packet.data[size++] = 0x01;
