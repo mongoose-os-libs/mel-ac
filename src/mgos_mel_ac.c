@@ -66,6 +66,13 @@ void mgos_mel_ac_params_update() {
   if (!control) return;  // Nothing to set, skipping
   mel->packet.data[0] = (uint8_t) control & 0xFF;
   mel->packet.data[1] = (uint8_t)(control >> 8) & 0xFF;
+  mel->params = mel->new_params;
+  mel->set_params = false;
+  LOG(LL_INFO, (">> power: %d, mode: %d, setpoint: %.1f, fan: %d, vane_vert: "
+                "%d, vane_horiz: %d, isee: %d",
+                mel->params.power, mel->params.mode, mel->params.setpoint,
+                mel->params.fan, mel->params.vane_vert, mel->params.vane_horiz,
+                mel->params.isee));
 
   mgos_mel_ac_packet_send(MGOS_MEL_AC_PACKET_FLAGS_SET,
                           MGOS_MEL_AC_PACKET_TYPE_SET_PARAMS,
@@ -87,6 +94,7 @@ void mgos_mel_ac_ext_temp_update() {
   mel->packet.data[0] = (uint8_t) control & 0xFF;
   mel->packet.data[1] = (uint8_t)(control >> 8) & 0xFF;
 
+  mel->set_ext_temp = false;
   mgos_mel_ac_packet_send(MGOS_MEL_AC_PACKET_FLAGS_SET,
                           MGOS_MEL_AC_PACKET_TYPE_SET_TEMP,
                           MGOS_MEL_AC_PACKET_DATA_SIZE);
@@ -108,7 +116,8 @@ static void mgos_mel_ac_svc_timer(void *arg) {
 
   int64_t now = mgos_uptime_micros();
 
-  if (now - mel->last_recv > MGOS_MEL_AC_PACKET_READ_TIMEOUT * 10 * 1e3) {
+  if (mel->connected &&
+      (now - mel->last_recv > MGOS_MEL_AC_PACKET_READ_TIMEOUT * 10 * 1e3)) {
     // No packets for 10 loops? reconnecting
     mel->connected = false;
     mgos_event_trigger(MGOS_MEL_AC_EV_CONNECTED, &mel->connected);
@@ -121,7 +130,7 @@ static void mgos_mel_ac_svc_timer(void *arg) {
   }
 
   if (now - mel->last_send < MGOS_MEL_AC_PACKET_SEND_DELAY * 1e3) return;
-  
+
   if (mel->set_params) {
     mgos_mel_ac_params_update();
     mel->packet_index = 0;
@@ -223,26 +232,22 @@ static void mgos_mel_ac_packet_handle() {
   bin_to_hex(str, (unsigned char *) &mel->packet, size + 1);
   mgos_event_trigger(MGOS_MEL_AC_EV_PACKET_READ, (void *) str);
 
+  uint16_t last_error = mel->packet.data[0] | (mel->packet.data[1] << 8);
+
   // Got data to parse?
   if (mel->packet.header.flags & MGOS_MEL_AC_PACKET_FLAGS_GET) {
     switch (mel->packet.type) {
-      case MGOS_MEL_AC_PACKET_TYPE_SET_PARAMS: {
-        mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_SET, (void *) &mel->params);
-        break;
-      }
       case MGOS_MEL_AC_PACKET_TYPE_GET_PARAMS: {
         struct mgos_mel_ac_params params = {MGOS_MEL_AC_PARAM_POWER_OFF,
-                                            MGOS_MEL_AC_PARAM_MODE_CURRENT,
+                                            MGOS_MEL_AC_PARAM_MODE_AUTO,
                                             0.00,
                                             MGOS_MEL_AC_PARAM_FAN_AUTO,
                                             MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO,
                                             MGOS_MEL_AC_PARAM_VANE_VERT_AUTO,
                                             MGOS_MEL_AC_PARAM_ISEE_OFF};
-        // uint16_t control_mask = mel->packet.data[0] | (mel->packet.data[1] <<
-        // 8);
         params.power = mel->packet.data[2];
-        params.mode = mel->packet.data[3] & 0x07;
-        params.isee = mel->packet.data[3] & 0x08 ? true : false;
+        params.mode = mel->packet.data[3];
+        params.isee = params.mode & MGOS_MEL_AC_PARAM_MODE_AUTO ? true : false;
         if (mel->packet.data[10] == 0) {
           params.setpoint = (float) (31 - mel->packet.data[4]);
         } else {
@@ -256,9 +261,15 @@ static void mgos_mel_ac_packet_handle() {
 
         if (mgos_mel_ac_params_changed(&params)) {
           mel->params = params;
-          if (!mel->set_params) mel->new_params = params;
+          mel->new_params = params;
+          LOG(LL_INFO,
+              ("<< power: %d, mode: %d, setpoint: %.1f, fan: %d, vane_vert: "
+               "%d, vane_horiz: %d, isee: %d",
+               mel->params.power, mel->params.mode, mel->params.setpoint,
+               mel->params.fan, mel->params.vane_vert, mel->params.vane_horiz,
+               mel->params.isee));
           mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_CHANGED,
-                             (void *) &mel->params);
+                             (void *) &mel->new_params);
         }
         return;
       }
@@ -329,11 +340,10 @@ static void mgos_mel_ac_packet_handle() {
     }
   }  // if flags
   else if (mel->packet.header.flags & MGOS_MEL_AC_PACKET_FLAGS_SET) {
-    // Save new params here
-    mel->params = mel->new_params;
-    mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_SET, (void *) &mel->params);
-    mel->set_params = false;
-    mel->set_ext_temp = false;
+    if (last_error)
+      mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_NOT_SET, NULL);
+    else
+      mgos_event_trigger(MGOS_MEL_AC_EV_PARAMS_SET, (void *) &mel->params);
   }
 }
 
@@ -485,7 +495,6 @@ bool mgos_mel_ac_set_power(enum mgos_mel_ac_param_power power) {
 bool mgos_mel_ac_set_mode(enum mgos_mel_ac_param_mode mode) {
   if (!mel) return false;
   switch (mode) {
-    case MGOS_MEL_AC_PARAM_MODE_CURRENT:
     case MGOS_MEL_AC_PARAM_MODE_AUTO:
     case MGOS_MEL_AC_PARAM_MODE_COOL:
     case MGOS_MEL_AC_PARAM_MODE_DRY:
@@ -577,49 +586,49 @@ void mgos_mel_ac_set_params(struct mgos_mel_ac_params *params) {
 
 enum mgos_mel_ac_param_power mgos_mel_ac_get_power() {
   if (mel)
-    return mel->params.power;
+    return mel->new_params.power;
   else
     return MGOS_MEL_AC_PARAM_POWER_OFF;
 }
 
 enum mgos_mel_ac_param_mode mgos_mel_ac_get_mode() {
   if (mel)
-    return mel->params.mode;
+    return mel->new_params.mode;
   else
-    return MGOS_MEL_AC_PARAM_MODE_CURRENT;
+    return MGOS_MEL_AC_PARAM_MODE_AUTO;
 }
 
 float mgos_mel_ac_get_setpoint() {
   if (mel)
-    return mel->params.setpoint;
+    return mel->new_params.setpoint;
   else
     return 0.0;
 }
 
 enum mgos_mel_ac_param_fan mgos_mel_ac_get_fan() {
   if (mel)
-    return mel->params.fan;
+    return mel->new_params.fan;
   else
     return MGOS_MEL_AC_PARAM_FAN_AUTO;
 }
 
 enum mgos_mel_ac_param_vane_vert mgos_mel_ac_get_vane_vert() {
   if (mel)
-    return mel->params.vane_vert;
+    return mel->new_params.vane_vert;
   else
     return MGOS_MEL_AC_PARAM_VANE_VERT_AUTO;
 }
 
 enum mgos_mel_ac_param_vane_horiz mgos_mel_ac_get_vane_horiz() {
   if (mel)
-    return mel->params.vane_horiz;
+    return mel->new_params.vane_horiz;
   else
     return MGOS_MEL_AC_PARAM_VANE_HORIZ_AUTO;
 }
 
 bool mgos_mel_ac_param_get_isee() {
   if (mel)
-    return mel->params.isee;
+    return mel->new_params.isee;
   else
     return false;
 }
