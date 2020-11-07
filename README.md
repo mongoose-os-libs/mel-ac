@@ -181,7 +181,6 @@ Library triggering events as follows:
 *   `MGOS_MEL_AC_EV_OPERATING_CHANGED`: when operating state changed on HVAC
 *   `MGOS_MEL_AC_EV_PARAMS_SET`: when new params successfully set to HVAC
 *   `MGOS_MEL_AC_EV_TIMER`: before every service timer handler running
-*   `MGOS_MEL_AC_EV_RX_COUNT`: when have new data to read in UART
 *   `MGOS_MEL_AC_EV_CONNECT_ERROR`: when handshake packet returned error
 
 #### To read params from HVAC
@@ -207,6 +206,8 @@ Setters return `false` in case of invalid argument value
 It's currently tested on ***ESP8266*** and ***ESP32*** platforms
 
 For a complete demonstration of the driver, look at this [Mongoose App](https://github.com/mongoose-os-apps/mel-ac-demo)
+
+Larger project is [mel-ac-homekit](https://github.com/mongoose-os-apps/mel-ac-homekit)
 
 ## Extra
 

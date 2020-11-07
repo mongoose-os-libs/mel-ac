@@ -357,9 +357,6 @@ void mgos_mel_ac_packet_read() {
 
   size_t rx_count = mgos_uart_read_avail(mel->uart_no);
 
-  // debug only
-  mgos_event_trigger(MGOS_MEL_AC_EV_RX_COUNT, (void *) &rx_count);
-
   uint8_t data;
   uint8_t *bytes = (uint8_t *) &mel->packet;
 
