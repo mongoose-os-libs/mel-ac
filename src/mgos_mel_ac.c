@@ -246,8 +246,8 @@ static void mgos_mel_ac_packet_handle() {
                                             MGOS_MEL_AC_PARAM_VANE_VERT_AUTO,
                                             MGOS_MEL_AC_PARAM_ISEE_OFF};
         params.power = mel->packet.data[2];
-        params.mode = mel->packet.data[3];
-        params.isee = params.mode & MGOS_MEL_AC_PARAM_MODE_AUTO ? true : false;
+        params.isee = mel->packet.data[3] > MGOS_MEL_AC_PARAM_MODE_AUTO ? true : false;
+        params.mode = params.isee ? mel->packet.data[3] & 0x07 : mel->packet.data[3];
         if (mel->packet.data[10] == 0) {
           params.setpoint = (float) (31 - mel->packet.data[4]);
         } else {
