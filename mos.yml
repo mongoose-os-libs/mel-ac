@@ -22,7 +22,7 @@ config_schema:
   - ["mel_ac.rpc_enable", "b", true, {title: "Enable MEL-AC rpc handlers"}]
 
 libs:
-  - origin: https://github.com/mongoose-os-libs/rpc-common
+  - location: https://github.com/mongoose-os-libs/rpc-common
 
 # Used by the mos tool to catch mos binaries incompatible with this file format
 manifest_version: 2020-08-02
